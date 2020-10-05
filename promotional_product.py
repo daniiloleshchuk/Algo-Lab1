@@ -27,9 +27,10 @@ def get_input_data_in_list(file_name: str):
     return products
 
 
-def print_algo_conclusion(algo_name: str, work_time, comparison_operations_quantity: int, exchange_operations_quantity:int):
+def print_algo_conclusion(algo_name: str, sort_by: str, work_time,
+                          comparison_operations_quantity: int, exchange_operations_quantity:int):
     print()
-    print("{} Sort by initial price".format(algo_name))
+    print("{} Sort by {}".format(algo_name, sort_by))
     print("Working time: {}".format(work_time))
     print("Comparison operations quantity: {}".format(comparison_operations_quantity))
     print("Exchange operations quantity: {}".format(exchange_operations_quantity))
@@ -72,7 +73,8 @@ def bubble_sort_by_initial_price(products_to_sort: list, reverse: bool = False):
     end_time = datetime.datetime.now()
     working_time = end_time - start_time
 
-    print_algo_conclusion('Bubble', working_time, comparison_operations_quantity, exchange_operations_quantity)
+    print_algo_conclusion('Bubble', 'initial price',
+                          working_time, comparison_operations_quantity, exchange_operations_quantity)
 
     return products_to_sort
 
@@ -130,7 +132,7 @@ def sort_by_discount_percentage(products_to_sort: list, reverse: bool = False):
     end_time = datetime.datetime.now()
     working_time = end_time - start_time
 
-    print_algo_conclusion('Merge', working_time, comparison_operations_quantity, exchange_operations_quantity)
+    print_algo_conclusion('Merge', 'discount percentage', working_time, comparison_operations_quantity, exchange_operations_quantity)
 
     return sorted_products
 
@@ -139,7 +141,10 @@ input_data = get_input_data_in_list('in_1.csv')
 for el in input_data:
     print(el)
 
-result = sort_by_discount_percentage(input_data, reverse=True)
-#result = bubble_sort_by_initial_price(input_data)
-for product in result:
+merge_result = sort_by_discount_percentage(input_data, reverse=False)
+for product in merge_result:
+    print(product.__str__())
+
+bubble_result = bubble_sort_by_initial_price(input_data, reverse=False)
+for product in bubble_result:
     print(product.__str__())
