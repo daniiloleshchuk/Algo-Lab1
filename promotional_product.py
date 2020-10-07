@@ -3,7 +3,8 @@ import csv
 
 
 class PromotionalProduct:
-    def __init__(self, discount_percentage: float, product_name: str, initial_price: float, promotional_price: float):
+
+    def __init__(self, product_name: str, initial_price: float, discount_percentage: float, promotional_price: float):
         self.product_name = product_name
         self.initial_price = initial_price
         self.discount_percentage = discount_percentage
@@ -20,131 +21,158 @@ def get_input_data_in_list(file_name: str):
     with open(file_name, 'r') as file:
         reader = csv.reader(file)
         for line in reader:
-            products.append(
-                PromotionalProduct(product_name=line[0], initial_price=float(line[1]),
-                                   discount_percentage=float(line[2]), promotional_price=float(line[3])))
+            products.append(PromotionalProduct(line[0], float(line[1]), float(line[2]), float(line[3])))
 
     return products
 
 
-def print_algo_conclusion(algo_name: str, sort_by: str, work_time,
-                          comparison_operations_quantity: int, exchange_operations_quantity:int):
+def print_algo_conclusion(algo_name: str, sort_by: str, work_time, comparisons: int, exchanges: int):
     print()
     print("{} Sort by {}".format(algo_name, sort_by))
     print("Working time: {}".format(work_time))
-    print("Comparison operations quantity: {}".format(comparison_operations_quantity))
-    print("Exchange operations quantity: {}".format(exchange_operations_quantity))
+    print("Comparison operations quantity: {}".format(comparisons))
+    print("Exchange operations quantity: {}".format(exchanges))
     print()
+
+
+def comparator(val1, val2, reverse: bool = False):
+    """
+
+    This function returns bool value, depends on values you passed in
+
+    :param val1: First value to compare
+    :param val2: Second value to compare
+    :param reverse: False by default. Pass 'True' to sort in descending order,
+     or pass 'False' to sort in ascending order.
+    :return: Bool value, that means val1 is more val2 or not
+
+    """
+    if reverse:
+        return val1 > val2
+    else:
+        return val1 < val2
+
+
+def merge_sort(list_to_sort: list, key, reverse: bool = False, comparisons=0, exchanges=0):
+    """
+
+    This function sorts the list in merge sort manner
+
+    :param list_to_sort: List that will be sorted
+    :param key: lambda to define by which key to sort
+    :param reverse: False by default. Pass 'True' to sort in descending order,
+     or pass 'False' to sort in ascending order.
+    :param comparisons: Quantity of comparison operations
+    :param exchanges: Quantity of exchange operations
+    :return: Quantity of comparison operations and quantity of exchange operations
+    """
+
+    if len(list_to_sort) > 1:
+        middle = len(list_to_sort) // 2
+        left_half = list_to_sort[:middle]
+        right_half = list_to_sort[middle:]
+
+        merge_sort(left_half, key, reverse)
+        merge_sort(right_half, key, reverse)
+
+        left_half_iterator = right_half_iterator = main_list_iterator = 0
+
+        while left_half_iterator < len(left_half) and right_half_iterator < len(right_half):
+            comparisons += 1
+
+            if comparator(key(left_half[left_half_iterator]), key(right_half[right_half_iterator]), reverse):
+                exchanges += 1
+                list_to_sort[main_list_iterator] = left_half[left_half_iterator]
+                left_half_iterator += 1
+
+            else:
+                list_to_sort[main_list_iterator] = right_half[right_half_iterator]
+                right_half_iterator += 1
+
+            main_list_iterator += 1
+
+        while left_half_iterator < len(left_half):
+            list_to_sort[main_list_iterator] = left_half[left_half_iterator]
+            left_half_iterator += 1
+            main_list_iterator += 1
+
+        while right_half_iterator < len(right_half):
+            list_to_sort[main_list_iterator] = right_half[right_half_iterator]
+            right_half_iterator += 1
+            main_list_iterator += 1
+
+        return comparisons, exchanges
+
+
+def merge_sort_by_discount_percentage(products_to_sort: list, reverse: bool = False):
+
+    start_time = datetime.datetime.now()
+
+    comparisons, exchanges = merge_sort(products_to_sort, key=lambda x: x.discount_percentage, reverse=reverse)
+
+    end_time = datetime.datetime.now()
+    working_time = end_time - start_time
+
+    print_algo_conclusion('Merge', 'discount percentage', working_time, comparisons, exchanges)
+
+
+def bubble_sort(list_to_sort: list, key, reverse: bool = False, comparisons=0, exchanges=0):
+    """
+
+    This function sorts the list in bubble sort manner
+
+    :param list_to_sort: List that will be sorted
+    :param key: lambda to define by which key to sort
+    :param reverse: False by default. Pass 'True' to sort in descending order,
+     or pass 'False' to sort in ascending order.
+    :param comparisons: Quantity of comparison operations
+    :param exchanges: Quantity of exchange operations
+    :return: Quantity of comparison operations and quantity of exchange operations
+    """
+    is_list_sorted = False
+    list_length = len(list_to_sort)
+    while not is_list_sorted:
+        is_list_sorted = True
+
+        for i in range(list_length - 1):
+            comparisons += 1
+
+            if comparator(key(list_to_sort[i]), key(list_to_sort[i + 1]), reverse):
+                exchanges += 1
+                is_list_sorted = False
+
+                list_to_sort[i], list_to_sort[i+1] = list_to_sort[i+1], list_to_sort[i]
+
+    return comparisons, exchanges
 
 
 def bubble_sort_by_initial_price(products_to_sort: list, reverse: bool = False):
     start_time = datetime.datetime.now()
 
-
-    comparison_operations_quantity = 0
-    exchange_operations_quantity = 0
-    is_list_sorted = False
-    list_length = len(products_to_sort)
-
-    while not is_list_sorted:
-        is_list_sorted = True
-
-        for i in range(list_length - 1):
-            comparison_operations_quantity += 1
-
-            if reverse is False:
-
-                if products_to_sort[i].initial_price > products_to_sort[i + 1].initial_price:
-                    exchange_operations_quantity += 1
-                    is_list_sorted = False
-
-                    products_to_sort[i].initial_price, products_to_sort[i + 1].initial_price = \
-                        products_to_sort[i + 1].initial_price, products_to_sort[i].initial_price
-
-            elif reverse is True:
-
-                if products_to_sort[i].initial_price < products_to_sort[i + 1].initial_price:
-                    exchange_operations_quantity += 1
-                    is_list_sorted = False
-
-                    products_to_sort[i].initial_price, products_to_sort[i + 1].initial_price = \
-                        products_to_sort[i + 1].initial_price, products_to_sort[i].initial_price
+    comparisons, exchanges = bubble_sort(products_to_sort, key=lambda x: x.initial_price, reverse=reverse)
 
     end_time = datetime.datetime.now()
     working_time = end_time - start_time
 
     print_algo_conclusion('Bubble', 'initial price',
-                          working_time, comparison_operations_quantity, exchange_operations_quantity)
-
-    return products_to_sort
+                          working_time, comparisons, exchanges)
 
 
-def sort_by_discount_percentage(products_to_sort: list, reverse: bool = False):
-    def merge_sort_by_discount_percentage(products_to_sort, reverse: bool = False,
-                                          comparison_operations_quantity=0, exchange_operations_quantity=0):
-        if len(products_to_sort) > 1:
-            m = len(products_to_sort) // 2
-            left = products_to_sort[:m]
-            right = products_to_sort[m:]
-
-            left, left_comparison_operations_quantity, left_exchange_operations_quantity = \
-                merge_sort_by_discount_percentage(left, reverse, comparison_operations_quantity,
-                                                  exchange_operations_quantity)
-            right, right_comparison_operations_quantity, right_exchange_operations_quantity = \
-                merge_sort_by_discount_percentage(right, reverse, comparison_operations_quantity,
-                                                  exchange_operations_quantity)
-
-            comparison_operations_quantity += left_comparison_operations_quantity + right_comparison_operations_quantity
-            exchange_operations_quantity += left_exchange_operations_quantity + right_exchange_operations_quantity
-
-            products_to_sort = []
-
-            while len(left) > 0 and len(right) > 0:
-                comparison_operations_quantity += 1
-                if not reverse:
-                    if left[0].discount_percentage < right[0].discount_percentage:
-                        exchange_operations_quantity += 1
-                        products_to_sort.append(left[0])
-                        left.pop(0)
-                    else:
-                        products_to_sort.append(right[0])
-                        right.pop(0)
-                elif reverse:
-                    if left[0].discount_percentage > right[0].discount_percentage:
-                        exchange_operations_quantity += 1
-                        products_to_sort.append(left[0])
-                        left.pop(0)
-                    else:
-                        products_to_sort.append(right[0])
-                        right.pop(0)
-            for i in left:
-                products_to_sort.append(i)
-            for i in right:
-                products_to_sort.append(i)
-
-        return products_to_sort, comparison_operations_quantity, exchange_operations_quantity
-
-    start_time = datetime.datetime.now()
-
-    sorted_products, comparison_operations_quantity, exchange_operations_quantity =\
-        merge_sort_by_discount_percentage(products_to_sort, reverse)
-
-    end_time = datetime.datetime.now()
-    working_time = end_time - start_time
-
-    print_algo_conclusion('Merge', 'discount percentage', working_time, comparison_operations_quantity, exchange_operations_quantity)
-
-    return sorted_products
-
+print()
 
 input_data = get_input_data_in_list('in_1.csv')
+
 for el in input_data:
-    print(el)
+    print(el.__str__())
 
-merge_result = sort_by_discount_percentage(input_data, reverse=False)
-for product in merge_result:
-    print(product.__str__())
+print()
 
-bubble_result = bubble_sort_by_initial_price(input_data, reverse=False)
-for product in bubble_result:
-    print(product.__str__())
+# merge_sort_by_discount_percentage(input_data, reverse=True)
+bubble_sort_by_initial_price(input_data, reverse=False)
+
+print()
+
+for el in input_data:
+    print(el.__str__())
+
+print()
