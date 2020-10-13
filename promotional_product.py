@@ -101,7 +101,7 @@ def merge_sort(list_to_sort: list, key, reverse: bool = False, comparisons=0, ex
             right_half_iterator += 1
             main_list_iterator += 1
 
-        return comparisons, exchanges
+    return comparisons, exchanges
 
 
 def merge_sort_by_discount_percentage(products_to_sort: list, reverse: bool = False):
@@ -159,6 +159,7 @@ def bubble_sort_by_initial_price(products_to_sort: list, reverse: bool = False):
 
 
 print()
+print("INITIAL")
 
 input_data = get_input_data_in_list('in_1.csv')
 
@@ -167,12 +168,14 @@ for el in input_data:
 
 print()
 
-# merge_sort_by_discount_percentage(input_data, reverse=True)
+#merge_sort_by_discount_percentage(input_data, reverse=True)
 bubble_sort_by_initial_price(input_data, reverse=False)
 
 print()
+print("Sorted")
 
 for el in input_data:
     print(el.__str__())
 
 print()
+
